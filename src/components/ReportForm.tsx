@@ -8,12 +8,22 @@ interface ReportFormProps {
 
 type FormLevel = "watch" | "warning" | "critical";
 
+const LEVEL_DESCRIPTIONS: Record<FormLevel, string> = {
+  watch: "Minor concern, worth monitoring",
+  warning: "Significant risk, needs attention",
+  critical: "Severe danger, immediate action needed",
+};
+
 export function ReportForm({ onSubmit, onDone }: ReportFormProps) {
   const [form, setForm] = useState({ title: "", location: "", product: "", level: "warning" as FormLevel, description: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const handleSubmit = () => {
-    if (!form.title || !form.location) return;
+    if (!form.title || !form.location) {
+      setTouched({ title: true, location: true });
+      return;
+    }
     const newAlert: Alert = {
       id: Date.now(),
       level: form.level,
@@ -30,6 +40,7 @@ export function ReportForm({ onSubmit, onDone }: ReportFormProps) {
     setTimeout(() => {
       setSubmitted(false);
       setForm({ title: "", location: "", product: "", level: "warning", description: "" });
+      setTouched({});
       onDone();
     }, 2500);
   };
@@ -39,12 +50,12 @@ export function ReportForm({ onSubmit, onDone }: ReportFormProps) {
   if (submitted) {
     return (
       <div
-        className="max-w-[520px] border border-accent bg-accent/10 rounded-lg p-10 text-center"
+        className="max-w-[560px] border border-accent bg-accent/10 rounded-xl p-12 text-center"
         style={{ animation: "slide-in 0.3s ease" }}
       >
-        <div className="text-5xl mb-3">✓</div>
-        <div className="text-base font-bold text-accent tracking-[2px]">REPORT SUBMITTED</div>
-        <div className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
+        <div className="text-6xl mb-4">✅</div>
+        <div className="text-xl font-bold text-accent tracking-wide">Report Submitted!</div>
+        <div className="text-sm text-muted-foreground mt-3 leading-relaxed">
           Your report is now live on the network.<br />Thank you for keeping Lahore safe.
         </div>
       </div>
@@ -52,30 +63,45 @@ export function ReportForm({ onSubmit, onDone }: ReportFormProps) {
   }
 
   return (
-    <div className="max-w-[520px]">
-      <div className="text-[10px] text-muted-foreground tracking-[2px] mb-4">
-        SUBMIT A FOOD SAFETY INCIDENT REPORT
+    <div className="max-w-[560px]">
+      <div className="mb-6">
+        <h2 className="text-lg font-bold text-foreground mb-1">Submit a Report</h2>
+        <p className="text-sm text-muted-foreground">Help keep Lahore safe by reporting food safety incidents</p>
       </div>
 
-      <div className="flex flex-col gap-3.5">
+      <div className="flex flex-col gap-5 bg-card rounded-xl border border-border p-5 sm:p-6">
         {[
-          { label: "INCIDENT TITLE *", key: "title" as const, placeholder: "e.g. Expired meat sold at..." },
-          { label: "LOCATION *", key: "location" as const, placeholder: "Store name & neighborhood" },
-          { label: "PRODUCT / ITEM", key: "product" as const, placeholder: "Product name & batch if known" },
-        ].map(field => (
-          <div key={field.key}>
-            <div className="text-[9px] text-muted-foreground tracking-[2px] mb-1.5">{field.label}</div>
-            <input
-              value={form[field.key]}
-              onChange={e => setForm({ ...form, [field.key]: e.target.value })}
-              placeholder={field.placeholder}
-              className="w-full bg-card border border-border rounded-md px-3.5 py-2.5 text-foreground text-xs outline-none font-mono focus:border-info transition-colors"
-            />
-          </div>
-        ))}
+          { label: "Incident Title", key: "title" as const, placeholder: "e.g. Expired meat sold at...", required: true },
+          { label: "Location", key: "location" as const, placeholder: "Store name & neighborhood", required: true },
+          { label: "Product / Item", key: "product" as const, placeholder: "Product name & batch if known (optional)", required: false },
+        ].map(field => {
+          const hasError = field.required && touched[field.key] && !form[field.key];
+          return (
+            <div key={field.key}>
+              <label className="text-xs text-muted-foreground tracking-wide mb-2 block font-medium">
+                {field.label} {field.required && <span className="text-critical">*</span>}
+              </label>
+              <input
+                value={form[field.key]}
+                onChange={e => setForm({ ...form, [field.key]: e.target.value })}
+                onBlur={() => setTouched({ ...touched, [field.key]: true })}
+                placeholder={field.placeholder}
+                className="w-full bg-background border rounded-lg px-4 py-3 text-foreground text-sm outline-none font-mono transition-colors"
+                style={{
+                  borderColor: hasError ? "hsl(var(--critical))" : "hsl(var(--border))",
+                }}
+              />
+              {hasError && (
+                <p className="text-xs mt-1.5 text-critical" style={{ animation: "slide-in 0.2s ease" }}>
+                  This field is required
+                </p>
+              )}
+            </div>
+          );
+        })}
 
         <div>
-          <div className="text-[9px] text-muted-foreground tracking-[2px] mb-1.5">SEVERITY LEVEL</div>
+          <label className="text-xs text-muted-foreground tracking-wide mb-2 block font-medium">Severity Level</label>
           <div className="flex gap-2">
             {(["watch", "warning", "critical"] as FormLevel[]).map(l => {
               const cfg = LEVEL_CONFIG[l];
@@ -84,9 +110,9 @@ export function ReportForm({ onSubmit, onDone }: ReportFormProps) {
                 <button
                   key={l}
                   onClick={() => setForm({ ...form, level: l })}
-                  className="flex-1 py-2 rounded-md text-[9px] tracking-[2px] uppercase transition-all duration-200"
+                  className="flex-1 py-3 rounded-lg text-xs tracking-wide capitalize transition-all duration-200 font-medium"
                   style={{
-                    border: `1px solid ${isActive ? cfg.color : "hsl(var(--border))"}`,
+                    border: `2px solid ${isActive ? cfg.color : "hsl(var(--border))"}`,
                     background: isActive ? cfg.bg : "transparent",
                     color: isActive ? cfg.color : "hsl(var(--muted-foreground))",
                   }}
@@ -96,36 +122,40 @@ export function ReportForm({ onSubmit, onDone }: ReportFormProps) {
               );
             })}
           </div>
+          <p className="text-xs text-muted-foreground/60 mt-2">
+            {LEVEL_DESCRIPTIONS[form.level]}
+          </p>
         </div>
 
         <div>
-          <div className="text-[9px] text-muted-foreground tracking-[2px] mb-1.5">DESCRIPTION</div>
+          <label className="text-xs text-muted-foreground tracking-wide mb-2 block font-medium">Description</label>
           <textarea
             value={form.description}
             onChange={e => setForm({ ...form, description: e.target.value })}
             placeholder="Describe what you observed in detail..."
             rows={4}
-            className="w-full bg-card border border-border rounded-md px-3.5 py-2.5 text-foreground text-xs outline-none font-mono resize-y focus:border-info transition-colors"
+            className="w-full bg-background border border-border rounded-lg px-4 py-3 text-foreground text-sm outline-none font-mono resize-y focus:border-info transition-colors"
           />
         </div>
 
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="py-3.5 rounded-md text-[11px] tracking-[3px] font-bold mt-1 transition-all duration-200"
+          className="py-4 rounded-lg text-sm tracking-wider font-bold transition-all duration-200"
           style={{
             background: canSubmit ? "linear-gradient(90deg, hsl(var(--critical)), hsl(var(--warning)))" : "hsl(var(--muted))",
             color: canSubmit ? "#fff" : "hsl(var(--muted-foreground))",
             cursor: canSubmit ? "pointer" : "not-allowed",
             border: "none",
+            opacity: canSubmit ? 1 : 0.7,
           }}
         >
-          ⚑ SUBMIT REPORT TO NETWORK
+          📝 Submit Report
         </button>
 
-        <div className="text-[9px] text-muted-foreground/60 tracking-[1px]">
-          * Required fields. Reports are reviewed and published within minutes.
-        </div>
+        <p className="text-xs text-muted-foreground/50 text-center">
+          Fields marked with <span className="text-critical">*</span> are required. Reports are reviewed within minutes.
+        </p>
       </div>
     </div>
   );
