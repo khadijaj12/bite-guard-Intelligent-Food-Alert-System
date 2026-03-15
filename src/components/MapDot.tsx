@@ -30,8 +30,8 @@ export function MapDot({ alert, selected, onClick }: MapDotProps) {
             height: 36,
             borderRadius: "50%",
             background: cfg.color,
-            opacity: 0.25,
-            animation: "ping-dot 1.5s ease-out infinite",
+            opacity: 0.2,
+            animation: "ping-dot 2s ease-out infinite",
           }}
         />
       )}
@@ -41,8 +41,8 @@ export function MapDot({ alert, selected, onClick }: MapDotProps) {
           width: selected ? 20 : 14,
           height: selected ? 20 : 14,
           background: cfg.color,
-          border: `3px solid ${selected ? "#fff" : cfg.color}`,
-          boxShadow: `0 0 ${selected ? 20 : 8}px ${cfg.color}`,
+          border: `3px solid ${selected ? "white" : cfg.color}`,
+          boxShadow: `0 0 ${selected ? 16 : 6}px ${cfg.color}60`,
         }}
       />
     </div>

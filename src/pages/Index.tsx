@@ -37,28 +37,27 @@ const Index = () => {
     { label: "Active Alerts", value: activeCount, color: LEVEL_CONFIG.critical.color, icon: "🔴" },
     { label: "Critical", value: criticalCount, color: LEVEL_CONFIG.critical.color, icon: "⚠️" },
     { label: "Total Reports", value: totalReports, color: LEVEL_CONFIG.resolved.color, icon: "📊" },
-    { label: "Locations Monitored", value: "47", color: "#4A9EFF", icon: "📍" },
+    { label: "Locations", value: "47", color: "hsl(var(--info))", icon: "📍" },
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-mono">
-      {/* Scanline overlay */}
-      <div className="safebite-scanline" />
+    <div className="min-h-screen bg-background text-foreground relative">
+      {/* Subtle background glow */}
+      <div className="safebite-glow" />
 
       {/* Critical alert banner */}
       {notifVisible && criticalCount > 0 && (
         <div
-          className="bg-critical px-4 sm:px-6 py-3 flex items-center justify-between text-xs sm:text-sm font-bold"
-          style={{ animation: "slide-in 0.3s ease", color: "#fff" }}
+          className="bg-destructive text-destructive-foreground px-4 sm:px-6 py-3 flex items-center justify-between text-sm font-semibold"
+          style={{ animation: "fade-in 0.3s ease" }}
         >
-          <span className="flex items-center gap-2" style={{ animation: "blink 1s infinite" }}>
+          <span className="flex items-center gap-2">
             <span className="text-base">⚠️</span>
-            <span>{criticalCount} Critical Alert{criticalCount > 1 ? "s" : ""} — Immediate Action Required</span>
+            <span>{criticalCount} critical alert{criticalCount > 1 ? "s" : ""} — please review immediately</span>
           </span>
           <button
             onClick={() => setNotifVisible(false)}
-            className="bg-transparent border-none cursor-pointer text-xl leading-none ml-4 hover:opacity-70 transition-opacity"
-            style={{ color: "#fff" }}
+            className="bg-transparent border-none cursor-pointer text-xl leading-none ml-4 hover:opacity-70 transition-opacity text-destructive-foreground"
             aria-label="Dismiss alert"
           >
             ×
@@ -67,57 +66,52 @@ const Index = () => {
       )}
 
       {/* Header */}
-      <div className="px-4 sm:px-7 pt-5 pb-1 border-b border-border">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3.5">
-            <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-              style={{ background: "linear-gradient(135deg, hsl(var(--critical)), hsl(var(--warning)))", boxShadow: "0 0 24px hsl(var(--critical) / 0.35)" }}
-            >
+      <header className="relative z-10 px-4 sm:px-8 pt-6 pb-2 border-b border-border bg-card/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between flex-wrap gap-3 max-w-6xl mx-auto">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center text-2xl shadow-md">
               🛡
             </div>
             <div>
-              <div className="text-xl sm:text-2xl font-bold tracking-[3px] text-foreground">SAFEBITE</div>
-              <div className="text-[11px] text-muted-foreground tracking-wider">Lahore Food Safety Network</div>
+              <div className="text-xl font-bold tracking-tight text-foreground">SafeBite</div>
+              <div className="text-xs text-muted-foreground">Lahore Food Safety Network</div>
             </div>
           </div>
 
-          <div className="flex gap-1.5 sm:gap-2">
+          <nav className="flex gap-1.5">
             {NAV_ITEMS.map(v => (
               <button
                 key={v.key}
                 onClick={() => setView(v.key)}
-                className="px-3 sm:px-5 py-2.5 rounded-lg text-xs sm:text-sm tracking-wide transition-all duration-200 hover:bg-foreground/5 flex items-center gap-1.5"
-                style={{
-                  border: `1px solid ${view === v.key ? "hsl(var(--accent))" : "hsl(var(--border))"}`,
-                  background: view === v.key ? "hsl(var(--accent) / 0.12)" : "transparent",
-                  color: view === v.key ? "hsl(var(--accent))" : "hsl(var(--muted-foreground))",
-                  fontWeight: view === v.key ? 700 : 400,
-                }}
+                className={`px-4 py-2 rounded-lg text-sm transition-all duration-200 flex items-center gap-1.5 font-medium ${
+                  view === v.key
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
               >
                 <span className="hidden sm:inline">{v.icon}</span>
                 {v.label}
               </button>
             ))}
-          </div>
+          </nav>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 py-5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 py-5 max-w-6xl mx-auto">
           {stats.map(s => (
-            <div key={s.label} className="bg-card/50 rounded-lg p-3 sm:p-4 border border-border/50">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-base">{s.icon}</span>
-                <span className="text-[11px] text-muted-foreground tracking-wide">{s.label}</span>
+            <div key={s.label} className="bg-background rounded-xl p-4 border border-border shadow-sm">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-lg">{s.icon}</span>
+                <span className="text-xs text-muted-foreground font-medium">{s.label}</span>
               </div>
               <div className="text-2xl sm:text-3xl font-bold" style={{ color: s.color }}>{s.value}</div>
             </div>
           ))}
         </div>
-      </div>
+      </header>
 
       {/* Content */}
-      <div className="px-4 sm:px-7 py-5">
+      <main className="relative z-10 px-4 sm:px-8 py-6 max-w-6xl mx-auto" style={{ animation: "fade-in 0.4s ease" }}>
         {view === "dashboard" && (
           <AlertDashboard
             alerts={alerts}
@@ -135,13 +129,13 @@ const Index = () => {
         {view === "report" && (
           <ReportForm onSubmit={handleNewReport} onDone={() => setView("dashboard")} />
         )}
-      </div>
+      </main>
 
       {/* Footer */}
-      <div className="border-t border-border px-4 sm:px-7 py-5 flex justify-between flex-wrap gap-2">
-        <span className="text-[10px] text-muted-foreground/50 tracking-wider">SafeBite Network © 2025 — Lahore Food Safety Initiative</span>
-        <span className="text-[10px] text-muted-foreground/50 tracking-wider">International Society Project</span>
-      </div>
+      <footer className="relative z-10 border-t border-border px-4 sm:px-8 py-5 flex justify-between flex-wrap gap-2 max-w-6xl mx-auto">
+        <span className="text-xs text-muted-foreground">SafeBite Network © 2025 — Lahore Food Safety Initiative</span>
+        <span className="text-xs text-muted-foreground">International Society Project</span>
+      </footer>
     </div>
   );
 };
