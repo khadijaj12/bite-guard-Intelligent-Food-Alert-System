@@ -41,10 +41,10 @@ export const ALERTS: Alert[] = [
 ];
 
 export const LEVEL_CONFIG: Record<string, { color: string; bg: string; label: string; pulse: boolean; twColor: string }> = {
-  critical: { color: "#FF2D2D", bg: "#FF2D2D15", label: "CRITICAL", pulse: true, twColor: "critical" },
-  warning:  { color: "#FF8C00", bg: "#FF8C0015", label: "WARNING",  pulse: true, twColor: "warning" },
-  watch:    { color: "#F5C518", bg: "#F5C51815", label: "WATCH",    pulse: false, twColor: "watch" },
-  resolved: { color: "#00C896", bg: "#00C89615", label: "RESOLVED", pulse: false, twColor: "resolved" },
+  critical: { color: "hsl(0 72% 55%)",   bg: "hsl(0 72% 96%)",   label: "Critical",  pulse: true,  twColor: "critical" },
+  warning:  { color: "hsl(32 95% 52%)",  bg: "hsl(32 95% 95%)",  label: "Warning",   pulse: true,  twColor: "warning" },
+  watch:    { color: "hsl(45 93% 47%)",   bg: "hsl(45 93% 94%)",  label: "Watch",     pulse: false, twColor: "watch" },
+  resolved: { color: "hsl(156 60% 42%)", bg: "hsl(156 60% 94%)", label: "Resolved",  pulse: false, twColor: "resolved" },
 };
 
 export const MAP_POSITIONS: Record<number, { top: string; left: string }> = {
