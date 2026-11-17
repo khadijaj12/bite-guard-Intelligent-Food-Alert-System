@@ -13,11 +13,19 @@ The system focuses on detecting ingredients that may conflict with allergies, di
 
 ## Technologies Used
 
-* Python
-* Data Processing Pipelines
-* Classification Logic
-* Rule-Based Decision Systems
+* React + TypeScript (Vite)
+* Tailwind CSS + shadcn/ui
+* Supabase
+* Rule-based ingredient and allergy checks
 
 ## Goal
 
 To create an intelligent assistant capable of improving consumer awareness and food safety through automated analysis of food-related information.
+
+## Running it locally
+
+```bash
+cp .env.example .env   # then fill in your Supabase URL, project ID and publishable key
+npm install
+npm run dev
+```
